@@ -1,7 +1,6 @@
 # HotelPriceAlert
 Scheduled Itaka hotel price monitoring with email alerts.
 
-# Hotel Price App 
 # Overview
 
 Hotel Price App is a full-stack application for monitoring hotel prices on Itaka.pl, sending alerts when prices change. It features:
