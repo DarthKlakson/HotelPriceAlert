@@ -24,7 +24,7 @@ public class ScraperService {
     private final ItakaPriceScraper scraper;
 
 
-    @Scheduled(fixedRate = 600_000 * 6) // co 200 sek
+    @Scheduled(fixedRate = 600_000) // 10 min
     @Transactional
     public void checkHotelPrices() {
         List<Hotel> hotels = hotelRepo.findAll();

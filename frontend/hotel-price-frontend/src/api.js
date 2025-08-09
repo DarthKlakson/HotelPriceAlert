@@ -1,20 +1,20 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: '/api', 
 });
 
 API.interceptors.request.use(config => {
   const token = localStorage.getItem('jwt');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
-export const register = data => API.post('/auth/register', data);
-export const login    = data => API.post('/auth/login', data);
-export const getHotels = ()   => API.get('/hotels');
-export const addHotel  = url  => API.post('/hotels', {
-  url: url,
-  name: null,
-  lastKnownPrice: null
-});
+export const register  = (data) => API.post('/auth/register', data);
+export const login     = (data) => API.post('/auth/login', data); // UWAGA: backend zwraca surowy string (JWT)
+
+export const getHotels = ()        => API.get('/hotels');
+export const addHotel  = (url)     => API.post('/hotels', { url });
+export const deleteHotel = (id)    => API.delete(`/hotels/${id}`);
