@@ -81,3 +81,6 @@ DELETE	/api/hotels/{id}	Delete a hotel
     MalformedJwtException: ensure frontend stores token as jwt in localStorage.
 
     Scraper errors: check ChromeDriver path and browser compatibility.
+
+# Database diagram
+![img.png](img.png)
