@@ -19,7 +19,6 @@ public class Hotel {
 
     private String name;
 
-    /** tutaj dodajemy pole na ostatnio znaną cenę */
     private String lastKnownPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)

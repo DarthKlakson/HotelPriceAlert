@@ -37,11 +37,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/email-logs/**"
                         ).permitAll()
                         // Public
                         .requestMatchers("/api/auth/**", "/api/test/**").permitAll()
-                        // Reszta
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
