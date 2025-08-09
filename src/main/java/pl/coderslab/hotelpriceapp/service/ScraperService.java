@@ -23,8 +23,8 @@ public class ScraperService {
     private final EmailService emailService;
     private final ItakaPriceScraper scraper;
 
-    // 60 minut (600_000 ms * 6). Zmieniaj w razie potrzeby.
-    @Scheduled(fixedRate = 200_00)
+
+    @Scheduled(fixedRate = 200_000) // 10 min
     @Transactional
     public void checkHotelPrices() {
         List<Hotel> hotels = hotelRepo.findAll();
