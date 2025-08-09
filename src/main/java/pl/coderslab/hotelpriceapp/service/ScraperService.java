@@ -23,76 +23,73 @@ public class ScraperService {
     private final EmailService emailService;
     private final ItakaPriceScraper scraper;
 
-
-    @Scheduled(fixedRate = 600_000) // 10 min
+    // 60 minut (600_000 ms * 6). Zmieniaj w razie potrzeby.
+    @Scheduled(fixedRate = 200_00)
     @Transactional
     public void checkHotelPrices() {
         List<Hotel> hotels = hotelRepo.findAll();
         for (Hotel hotel : hotels) {
             try {
-                String url      = hotel.getUrl();
-                String newName  = scraper.scrapeName(url);
-                BigDecimal price = scraper.scrapeLowestPrice(url);
+                var res = scraper.scrapeNameAndLowestPrice(hotel.getUrl());
 
                 // Aktualizacja nazwy, jeżeli się zmieniła
-                if (!newName.equals(hotel.getName())) {
-                    hotel.setName(newName);
+                if (res.name() != null && !res.name().equals(hotel.getName())) {
+                    hotel.setName(res.name());
                     hotelRepo.save(hotel);
                 }
 
-                if (price == null) {
-                    // nie udało się pobrać ceny
+                if (res.price() == null) {
+                    // nie udało się pobrać ceny – pomijamy
                     continue;
                 }
 
-                // Pobranie ostatniej zapisanej ceny
                 BigDecimal last = hotel.getLastKnownPrice() != null
                         ? new BigDecimal(hotel.getLastKnownPrice())
                         : null;
 
-                // Pierwszy pomiar
                 if (last == null) {
-                    hotel.setLastKnownPrice(price.toPlainString());
+                    // Pierwszy pomiar
+                    hotel.setLastKnownPrice(res.price().toPlainString());
                     hotelRepo.save(hotel);
 
                     histRepo.save(PriceHistory.builder()
                             .hotel(hotel)
-                            .price(price.toPlainString())
+                            .price(res.price().toPlainString())
                             .timestamp(LocalDateTime.now())
                             .build());
 
                     emailService.sendPriceAlert(
                             hotel.getUser().getEmail(),
                             "Pierwsza cena dla: " + hotel.getName(),
-                            "Zapisana cena: " + price + " zł\nURL: " + url
+                            "Zapisana cena: " + res.price() + " zł\nURL: " + hotel.getUrl()
                     );
 
-                    // 4) Cena spadła
-                } else if (price.compareTo(last) < 0) {
-                    hotel.setLastKnownPrice(price.toPlainString());
+                } else if (res.price().compareTo(last) < 0) {
+                    // Cena spadła
+                    hotel.setLastKnownPrice(res.price().toPlainString());
                     hotelRepo.save(hotel);
 
                     histRepo.save(PriceHistory.builder()
                             .hotel(hotel)
-                            .price(price.toPlainString())
+                            .price(res.price().toPlainString())
                             .timestamp(LocalDateTime.now())
                             .build());
 
                     emailService.sendPriceAlert(
                             hotel.getUser().getEmail(),
                             "Cena spadła: " + hotel.getName(),
-                            "Nowa niższa cena: " + price + " zł\nURL: " + url
+                            "Nowa niższa cena: " + res.price() + " zł\nURL: " + hotel.getUrl()
                     );
 
-                    // 5) Cena wzrosła
-                } else if (price.compareTo(last) > 0) {
-                    hotel.setLastKnownPrice(price.toPlainString());
+                } else if (res.price().compareTo(last) > 0) {
+                    // Cena wzrosła
+                    hotel.setLastKnownPrice(res.price().toPlainString());
                     hotelRepo.save(hotel);
 
                     emailService.sendPriceAlert(
                             hotel.getUser().getEmail(),
                             "Cena wzrosła: " + hotel.getName(),
-                            "Nowa wyższa cena: " + price + " zł\nURL: " + url
+                            "Nowa wyższa cena: " + res.price() + " zł\nURL: " + hotel.getUrl()
                     );
                 }
             } catch (Exception ex) {

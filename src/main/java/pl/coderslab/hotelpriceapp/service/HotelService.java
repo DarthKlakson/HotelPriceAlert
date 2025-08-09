@@ -13,7 +13,6 @@ import pl.coderslab.hotelpriceapp.repository.UserRepository;
 import pl.coderslab.hotelpriceapp.scraper.ItakaPriceScraper;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,32 +31,27 @@ public class HotelService {
         User u = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony"));
 
-        String url      = dto.getUrl();
-        String name     = scraper.scrapeName(url);
-        BigDecimal bd   = scraper.scrapeLowestPrice(url);
-        String priceStr = bd != null ? bd.toPlainString() : null;
+        var res = scraper.scrapeNameAndLowestPrice(dto.getUrl());
 
-        // Zapisujemy hotel BEZ lastKnownPrice
+        // Zapisujemy hotel
         Hotel h = Hotel.builder()
-                .url(url)
-                .name(name)
+                .url(dto.getUrl())
+                .name(res.name())
                 .user(u)
                 .build();
         hotelRepo.save(h);
 
-        // Natychmiast zapisujemy pierwszy pomiar w history, by scheduler nie potraktował następnego odczytu jako "podwyżki"
-        if (priceStr != null) {
+        // Pierwszy pomiar
+        if (res.price() != null) {
             histRepo.save(PriceHistory.builder()
                     .hotel(h)
-                    .price(priceStr)
+                    .price(res.price().toPlainString())
                     .timestamp(LocalDateTime.now())
                     .build());
         }
     }
 
-
-      // Pobiera DTO hoteli zalogowanego użytkownika.
-
+    // Pobiera DTO hoteli zalogowanego użytkownika.
     public List<HotelDTO> getHotelsForUser(String username) {
         User u = userRepo.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony"));
