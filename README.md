@@ -70,7 +70,7 @@ Frontend runs on http://localhost:3000.
 Method	Endpoint	Description
 POST	/api/auth/register	Register a new user
 POST	/api/auth/login	Login & get JWT
-GET	/api/hotels	List user hotels
+GET	    /api/hotels	List user hotels
 POST	/api/hotels	Add a hotel
 DELETE	/api/hotels/{id}	Delete a hotel
 
