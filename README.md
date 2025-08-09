@@ -86,13 +86,14 @@ http://localhost:3000
     Every sent email is stored in the EmailLog table (including errors).
 
 # API Endpoints (examples)
-Method	Endpoint	Description
-POST	/api/auth/register	Register a new user
-POST	/api/auth/login	Login & get JWT
-GET	/api/hotels	List user hotels
-POST	/api/hotels	Add a hotel
-DELETE	/api/hotels/{id}	Delete a hotel
-Entities & Relationships
+## Method	Endpoint	Description
+##### POST	/api/auth/register	Register a new user
+##### POST	/api/auth/login	Login & get JWT
+##### GET	/api/hotels	List user hotels
+##### POST	/api/hotels	Add a hotel
+##### DELETE	/api/hotels/{id}	Delete a hotel
+
+# Entities & Relationships
 
     User → (1:N) → Hotel
 
